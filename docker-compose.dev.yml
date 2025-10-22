@@ -31,7 +31,8 @@ services:
     restart: always
     networks:
       - sgivu-network
-    env_file: .env.dev
+    environment:
+      - SPRING_PROFILES_ACTIVE=git
 
   sgivu-discovery:
     container_name: sgivu-discovery
