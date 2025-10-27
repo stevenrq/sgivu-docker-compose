@@ -3,7 +3,7 @@ services:
     container_name: sgivu-mysql
     image: mysql:8.0
     ports:
-      - "3306:3306"
+      - "3307:3306" # 3307 expuesto para el host, 3306 para el contenedor
     restart: always
     env_file: .env.dev
     networks:
@@ -15,7 +15,7 @@ services:
     container_name: sgivu-postgres
     image: postgres:17.6
     ports:
-      - "5432:5432"
+      - "5433:5432" # 5433 expuesto para el host, 5432 para el contenedor
     restart: always
     env_file: .env.dev
     networks:
