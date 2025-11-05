@@ -7,7 +7,10 @@ services:
     restart: always
     networks:
       - sgivu-network
-    env_file: .env
+    environment:
+      - SPRING_PROFILES_ACTIVE=git
+      - SPRING_CLOUD_CONFIG_SERVER_GIT_URI=https://github.com/stevenrq/sgivu-config-repo.git
+      - SPRING_CLOUD_CONFIG_SERVER_GIT_DEFAULT_LABEL=main
 
   sgivu-discovery:
     container_name: sgivu-discovery
@@ -61,6 +64,34 @@ services:
     image: stevenrq/sgivu-client:v1
     ports:
       - "8082:8082"
+    restart: always
+    networks:
+      - sgivu-network
+    env_file: .env
+    depends_on:
+      - sgivu-config
+      - sgivu-discovery
+      - sgivu-auth
+
+  sgivu-vehicle:
+    container_name: sgivu-vehicle
+    image: stevenrq/sgivu-vehicle:v1
+    ports:
+      - "8083:8083"
+    restart: always
+    networks:
+      - sgivu-network
+    env_file: .env.dev
+    depends_on:
+      - sgivu-config
+      - sgivu-discovery
+      - sgivu-auth
+
+  sgivu-purchase-sale:
+    container_name: sgivu-purchase-sale
+    image: stevenrq/sgivu-purchase-sale:v1
+    ports:
+      - "8084:8084"
     restart: always
     networks:
       - sgivu-network
