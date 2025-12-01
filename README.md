@@ -62,6 +62,9 @@ Agrega `-v` si necesitas limpiar los volúmenes creados durante las pruebas.
 - Versiona tus imágenes con tags (`stevenrq/sgivu-auth:v1`, etc.) y documenta los cambios al actualizar.
 - Revisa dependencias en `depends_on` después de agregar nuevos servicios para garantizar el orden correcto de arranque.
 
+## 📐 Diagramas
+- Vista del stack Compose: `docs/architecture/01-compose-stack.puml`
+
 ## ☁️ Despliegue en AWS
 
 - Ajusta `docker-compose.yml` para apuntar a recursos administrados (RDS, S3) usando variables definidas en `.env`.

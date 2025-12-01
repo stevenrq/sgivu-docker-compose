@@ -40,3 +40,6 @@
 - Do not commit real `.env` content or private keys; use placeholders and share secrets via secure channels.
 - Restrict exposed ports to what the gateway needs; prefer internal networks for DBs and Zipkin.
 - Rotate image tags when updating dependencies and document breaking changes (ports, env vars, volume names) in the PR.
+
+## Architecture Docs
+- Compose stack view: `docs/architecture/01-compose-stack.puml`

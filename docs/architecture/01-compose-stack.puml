@@ -1,0 +1,69 @@
+@startuml
+' Stack de Docker Compose definido en este repo.
+' Basado en docker-compose.yml y docker-compose.dev.yml (.env.dev):
+' incluye servicios SGIVU, bases de datos locales (MySQL para Zipkin y Postgres para dominios),
+' red bridge sgivu-network y volúmenes mysql-data/postgres-data.
+left to right direction
+
+skinparam node {
+  Shadowing false
+  RoundCorner 8
+}
+skinparam database {
+  Shadowing false
+}
+
+rectangle "Red Docker\nsgivu-network" {
+  node "Config Server\nsgivu-config:8888" as Config
+  node "Eureka\nsgivu-discovery:8761" as Eureka
+  node "API Gateway\nsgivu-gateway:8080" as Gateway
+  node "Auth\nsgivu-auth:9000" as Auth
+  node "User\nsgivu-user:8081" as UserSvc
+  node "Client\nsgivu-client:8082" as ClientSvc
+  node "Vehicle\nsgivu-vehicle:8083" as VehicleSvc
+  node "Purchase/Sale\nsgivu-purchase-sale:8084" as PurchaseSvc
+  node "ML FastAPI\nsgivu-ml:8000" as MLSvc
+  node "Zipkin\n9411" as Zipkin
+
+  database "PostgreSQL\nsgivu-postgres:5432\nvolumen postgres-data" as Postgres
+  database "MySQL\nsgivu-mysql:3306\nvolumen mysql-data" as MySQL
+}
+
+Zipkin --> MySQL : storage\nsgivu_zipkin_db
+Auth --> Postgres : sgivu_auth_db
+UserSvc --> Postgres : sgivu_user_db
+ClientSvc --> Postgres : sgivu_client_db
+VehicleSvc --> Postgres : sgivu_vehicle_db
+PurchaseSvc --> Postgres : sgivu_purchase_sale_db
+
+Gateway --> Auth
+Gateway --> UserSvc
+Gateway --> ClientSvc
+Gateway --> VehicleSvc
+Gateway --> PurchaseSvc
+Gateway --> MLSvc
+
+Auth ..> Config
+UserSvc ..> Config
+ClientSvc ..> Config
+VehicleSvc ..> Config
+PurchaseSvc ..> Config
+Gateway ..> Config
+MLSvc ..> Auth : Descubrimiento OIDC\n(SGIVU_AUTH_DISCOVERY_URL)
+
+Auth ..> Eureka
+UserSvc ..> Eureka
+ClientSvc ..> Eureka
+VehicleSvc ..> Eureka
+PurchaseSvc ..> Eureka
+Gateway ..> Eureka
+
+note right of Config
+  Config Server lee sgivu-config-repo\n(main/develop según perfil).
+end note
+
+note bottom of MLSvc
+  No BD propia; modelos en disco.\nUsa header X-Internal-Service-Key\npara llamadas a otros MS.
+end note
+
+@enduml
