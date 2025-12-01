@@ -127,6 +127,18 @@ services:
       - sgivu-discovery
       - sgivu-auth
 
+  sgivu-ml:
+    container_name: sgivu-ml
+    image: stevenrq/sgivu-ml:v1
+    ports:
+      - "8000:8000"
+    restart: always
+    networks:
+      - sgivu-network
+    env_file: .env.dev
+    depends_on:
+      - sgivu-auth
+
   sgivu-gateway:
     container_name: sgivu-gateway
     image: stevenrq/sgivu-gateway:v1
