@@ -42,4 +42,5 @@
 - Rotate image tags when updating dependencies and document breaking changes (ports, env vars, volume names) in the PR.
 
 ## Architecture Docs
+
 - Compose stack view: `docs/architecture/01-compose-stack.puml`
