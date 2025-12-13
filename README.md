@@ -33,16 +33,12 @@ Repositorio de infraestructura para levantar el ecosistema de microservicios de 
 
 ## 🚀 Ejecución
 
-Uso recomendado para desarrollo local:
+Script unificado:
 
 ```bash
-docker compose -f docker-compose.dev.yml --env-file .env.dev up -d
-```
-
-Para un entorno productivo (usando imágenes y endpoints remotos):
-
-```bash
-docker compose up -d
+chmod +x run.bash   # primera vez
+./run.bash --dev    # stack de desarrollo
+./run.bash --prod   # stack productivo
 ```
 
 Para detener la plataforma completa:
