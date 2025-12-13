@@ -1,0 +1,66 @@
+@startuml
+' Pipeline de construcción y publicación de imágenes SGIVU para este repo.
+' Basado en: build_push_all.bash (recorre microservicios, entra a cada carpeta y ejecuta build-image.bash si existe; si no, usa flujo genérico mvnw/requirements + docker build/push).
+left to right direction
+
+skinparam node {
+  Shadowing false
+  RoundCorner 8
+}
+
+actor "DevOps/CI" as Dev
+
+node "build-docker-images\n(orquestador bash)" as Scripts {
+  component "build_push_all.bash\norquesta todos" as All
+}
+
+cloud "Docker Hub\nstevenrq/*:v1" as DockerHub
+node "/home/steven/Documents/sgivu/code/backend/*" as Sources
+node "Servicios\n/home/steven/Documents/sgivu/code/backend" as Services {
+  component "sgivu-auth/\nbuild-image.bash" as Auth
+  component "sgivu-user/\nbuild-image.bash" as User
+  component "sgivu-client/\nbuild-image.bash" as Client
+  component "sgivu-vehicle/\nbuild-image.bash" as Vehicle
+  component "sgivu-purchase-sale/\nbuild-image.bash" as Purchase
+  component "sgivu-gateway/\nbuild-image.bash" as Gateway
+  component "sgivu-config/\nbuild-image.bash" as Config
+  component "sgivu-discovery/\nbuild-image.bash" as Discovery
+  component "sgivu-ml/\nbuild-image.bash\n(detector Python, sin Maven)" as ML
+}
+
+Dev --> All : Ejecuta\n(build+push todos)
+All --> Auth
+All --> User
+All --> Client
+All --> Vehicle
+All --> Purchase
+All --> Gateway
+All --> Config
+All --> Discovery
+All --> ML
+
+Auth --> Sources
+User --> Sources
+Client --> Sources
+Vehicle --> Sources
+Purchase --> Sources
+Gateway --> Sources
+Config --> Sources
+Discovery --> Sources
+ML --> Sources
+
+Auth --> DockerHub : docker build/push\nstevenrq/sgivu-auth:v1
+User --> DockerHub : docker build/push\nstevenrq/sgivu-user:v1
+Client --> DockerHub : docker build/push\nstevenrq/sgivu-client:v1
+Vehicle --> DockerHub : docker build/push\nstevenrq/sgivu-vehicle:v1
+Purchase --> DockerHub : docker build/push\nstevenrq/sgivu-purchase-sale:v1
+Gateway --> DockerHub : docker build/push\nstevenrq/sgivu-gateway:v1
+Config --> DockerHub : docker build/push\nstevenrq/sgivu-config:v1
+Discovery --> DockerHub : docker build/push\nstevenrq/sgivu-discovery:v1
+ML --> DockerHub : docker build/push\nstevenrq/sgivu-ml:v1
+
+note right of All
+  Usa MAP SERVICES tag=v1; ruta BASE_DIR\n/home/steven/Documents/sgivu/code/backend.\nSi existe build-image.bash en el servicio, lo ejecuta.\nSi no existe, corre mvnw clean package -DskipTests\n(salta Maven si hay requirements.txt)\ny luego docker build/push.
+end note
+
+@enduml

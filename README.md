@@ -12,15 +12,24 @@ Repositorio de infraestructura para levantar el ecosistema de microservicios de 
 
 ## ⚙️ Estructura del Repositorio
 
-```
+```text
 ├── .env                        # Variables de entorno para despliegues en AWS (no se versiona)
 ├── .env.dev                    # Variables de entorno para desarrollo local (no se versiona)
 ├── clave.pem                   # Clave privada para acceso SSH a instancias EC2 (no se versiona)
 ├── docker-compose.yml          # Definición principal orientada a entornos productivos
 ├── docker-compose.dev.yml      # Variante local con bases de datos auto gestionadas
+├── build-and-push-images.bash  # Script para construir y publicar todas las imágenes
 ├── LICENSE
 └── README.md
 ```
+
+## 🏗️ Pipeline de build y publicación
+
+- Script automatizado: ejecuta `./build-and-push-images.bash` desde la raíz del repo para recorrer todos los microservicios en `../` y:
+  - Invocar `build-image.bash` si existe en cada servicio.
+  - Si no, compilar con Maven (`./mvnw clean package -DskipTests`) salvo proyectos Python (detecta `requirements.txt`).
+  - Construir y subir imágenes Docker a `stevenrq/<servicio>:v1`.
+- Diagrama del pipeline: ver [docs/architecture/01-build-pipeline.puml](docs/architecture/01-build-pipeline.puml).
 
 ## 🚀 Ejecución
 
@@ -63,7 +72,9 @@ Agrega `-v` si necesitas limpiar los volúmenes creados durante las pruebas.
 - Revisa dependencias en `depends_on` después de agregar nuevos servicios para garantizar el orden correcto de arranque.
 
 ## 📐 Diagramas
-- Vista del stack Compose: `docs/architecture/01-compose-stack.puml`
+
+- Pipeline de build/push: [docs/architecture/01-build-pipeline.puml](docs/architecture/01-build-pipeline.puml)
+- Vista del stack Compose: [docs/architecture/01-compose-stack.puml](docs/architecture/01-compose-stack.puml)
 
 ## ☁️ Despliegue en AWS
 
